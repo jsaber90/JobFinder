@@ -12,17 +12,19 @@ class JobRepository(
     suspend fun saveSearch(search: SavedSearchEntity) = savedSearchDao.insert(search)
     suspend fun deleteSearch(search: SavedSearchEntity) = savedSearchDao.delete(search)
 
-    suspend fun saveJobs(jobs: List<JobEntity>) {
-        dao.insertAll(jobs)
+    suspend fun saveJobs(jobs: List<JobEntity>): List<JobEntity> {
+        if (jobs.isEmpty()) return emptyList()
+        return dao.insertAll(jobs)
+            .mapIndexedNotNull { index, rowId -> jobs[index].takeIf { rowId != -1L } }
     }
 
-    suspend fun syncFromJooble(api: JoobleApi, apiKey: String, keyword: String) {
-        if (apiKey.isBlank()) return
+    suspend fun syncFromJooble(api: JoobleApi, apiKey: String, keyword: String): List<JobEntity> {
+        if (apiKey.isBlank()) return emptyList()
         val response = api.search(
             apiKey,
             JoobleSearchRequest(keywords = keyword, location = "Egypt")
         )
-        saveJobs(response.jobs.mapNotNull { job ->
+        return saveJobs(response.jobs.mapNotNull { job ->
             val id = job.id?.toString() ?: job.link ?: return@mapNotNull null
             JobEntity(
                 id = id,
