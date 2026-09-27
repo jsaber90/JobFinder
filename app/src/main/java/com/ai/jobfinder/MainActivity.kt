@@ -38,6 +38,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,6 +48,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -80,7 +83,11 @@ class MainActivity : ComponentActivity() {
         com.ai.jobfinder.data.JobSyncWorker.schedule(applicationContext)
         setContent {
             var darkMode by rememberSaveable { mutableStateOf(preferences.getBoolean("dark_mode", false)) }
+            val language = preferences.getString("language", "en") ?: "en"
             JobFinderTheme(darkTheme = darkMode) {
+                CompositionLocalProvider(
+                    LocalLayoutDirection provides if (language == "ar") LayoutDirection.Rtl else LayoutDirection.Ltr
+                ) {
                 val jobViewModel: com.ai.jobfinder.ui.JobViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         @Suppress("UNCHECKED_CAST")
@@ -104,10 +111,14 @@ class MainActivity : ComponentActivity() {
                         preferences.edit().putBoolean("dark_mode", it).apply()
                     },
                     onLanguageChanged = { language ->
-                        preferences.edit().putString("language", language).apply()
+                        preferences.edit()
+                            .putString("language", language)
+                            .putString("last_route", "jobs")
+                            .apply()
                         recreate()
                     }
                 )
+                }
             }
         }
     }
