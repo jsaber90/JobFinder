@@ -57,7 +57,7 @@ The current Android prototype reads this local value to test Jooble integration.
 
 - Add Jooble API synchronization
 - Add WorkManager periodic background sync
-- Add push and email notifications for new jobs
+- Show in-app notifications when the background sync finds new matching jobs
 - Add saved searches and job details
 - Add direct application links
 
