@@ -6,6 +6,9 @@
     <string name="saved_searches_icon_description">Saved searches</string>
     <string name="settings_icon_description">Settings</string>
     <string name="back">Back</string>
+    <string name="job_notifications">Job notifications</string>
+    <string name="new_job_found">New job found</string>
+    <string name="tap_to_search_again">Tap to search again</string>
     <string name="search_jobs_hint">Search jobs, skills, or companies</string>
     <string name="no_matching_jobs">No matching jobs found yet.</string>
     <string name="tap_to_apply">Tap to apply</string>
