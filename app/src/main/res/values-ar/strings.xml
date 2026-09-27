@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">JobFinder</string>
+    <string name="jobs">الوظائف</string>
+    <string name="saved_searches">عمليات البحث المحفوظة</string>
+    <string name="settings">الإعدادات</string>
+    <string name="search_jobs_hint">ابحث عن وظائف أو مهارات أو شركات</string>
+    <string name="no_matching_jobs">لا توجد وظائف مطابقة حتى الآن.</string>
+    <string name="tap_to_apply">اضغط للتقديم</string>
+    <string name="job_keyword">كلمة البحث عن الوظيفة</string>
+    <string name="notification_email">البريد الإلكتروني للتنبيهات</string>
+    <string name="save_search">حفظ البحث</string>
+    <string name="remove">حذف</string>
+    <string name="appearance">المظهر</string>
+    <string name="dark_mode">الوضع الداكن</string>
+    <string name="language">اللغة</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="email_delivery_note">إرسال البريد الإلكتروني يحتاج إلى إعداد مزود خلفي.</string>
+</resources>
+
