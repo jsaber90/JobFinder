@@ -22,21 +22,6 @@ JobFinder is an Android app for finding relevant job opportunities by keyword, w
 - WorkManager
 - Kotlin coroutines
 
-## Build and run
-
-Set the Android SDK and Java paths, then run:
-
-```powershell
-./gradlew.bat assembleDebug
-```
-
-Install on a connected Android device:
-
-```powershell
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell monkey -p com.ai.jobfinder 1
-```
-
 ## Job API
 
 The planned job source is the Jooble Egypt REST API:
