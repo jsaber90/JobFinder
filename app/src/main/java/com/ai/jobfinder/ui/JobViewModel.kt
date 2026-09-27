@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ai.jobfinder.data.JobEntity
 import com.ai.jobfinder.data.JobRepository
+import com.ai.jobfinder.data.SavedSearchEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,9 +12,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class JobViewModel(repository: JobRepository) : ViewModel() {
+class JobViewModel(private val repository: JobRepository) : ViewModel() {
     private val query = MutableStateFlow("")
     private val allJobs = repository.observeJobs()
+    val savedSearches: StateFlow<List<SavedSearchEntity>> = repository.observeSavedSearches()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
         viewModelScope.launch {
@@ -38,6 +41,17 @@ class JobViewModel(repository: JobRepository) : ViewModel() {
 
     fun updateQuery(value: String) {
         query.value = value
+    }
+
+    fun addSavedSearch(keyword: String, email: String) {
+        if (keyword.isBlank() || email.isBlank()) return
+        viewModelScope.launch {
+            repository.saveSearch(SavedSearchEntity(keyword = keyword.trim(), email = email.trim()))
+        }
+    }
+
+    fun removeSavedSearch(search: SavedSearchEntity) {
+        viewModelScope.launch { repository.deleteSearch(search) }
     }
 }
 
