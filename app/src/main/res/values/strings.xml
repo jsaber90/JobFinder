@@ -21,6 +21,6 @@
     <string name="language">Language</string>
     <string name="english">English</string>
     <string name="arabic">Arabic</string>
-    <string name="email_delivery_note">Email delivery requires a configured backend provider.</string>
+    <string name="email_delivery_note">You will receive in-app notifications for new matching jobs.</string>
 </resources>
 
