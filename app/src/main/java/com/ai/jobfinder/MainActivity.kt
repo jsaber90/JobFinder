@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,6 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.ai.jobfinder.data.AppDatabase
 import com.ai.jobfinder.data.JobRepository
 import com.ai.jobfinder.ui.theme.JobFinderTheme
@@ -105,41 +110,73 @@ private fun JobFinderScreen(
     onDarkModeChanged: (Boolean) -> Unit,
     onLanguageChanged: (String) -> Unit
 ) {
-    var selectedPage by rememberSaveable { mutableStateOf(0) }
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "jobs") {
+        composable("jobs") { JobsPage(viewModel, navController) }
+        composable("saved") { SavedSearchesPage(viewModel, navController) }
+        composable("settings") { SettingsPage(darkMode, onDarkModeChanged, onLanguageChanged, navController) }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun JobsPage(viewModel: com.ai.jobfinder.ui.JobViewModel, navController: NavHostController) {
+    PageScaffold(
+        title = stringResource(R.string.jobs),
+        navController = navController,
+        showBack = false,
+        actions = {
+            IconButton(onClick = { navController.navigate("saved") }) {
+                Icon(Icons.Default.BookmarkBorder, contentDescription = stringResource(R.string.saved_searches_icon_description))
+            }
+            IconButton(onClick = { navController.navigate("settings") }) {
+                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings_icon_description))
+            }
+        }
+    ) { JobsContent(viewModel) }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SavedSearchesPage(viewModel: com.ai.jobfinder.ui.JobViewModel, navController: NavHostController) {
+    PageScaffold(stringResource(R.string.saved_searches), navController, true) { SavedSearchesContent(viewModel) }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SettingsPage(darkMode: Boolean, onDarkModeChanged: (Boolean) -> Unit, onLanguageChanged: (String) -> Unit, navController: NavHostController) {
+    PageScaffold(stringResource(R.string.settings), navController, true) {
+        SettingsContent(darkMode, onDarkModeChanged, onLanguageChanged)
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PageScaffold(
+    title: String,
+    navController: NavHostController,
+    showBack: Boolean,
+    actions: @Composable () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        when (selectedPage) {
-                            1 -> stringResource(R.string.saved_searches)
-                            2 -> stringResource(R.string.settings)
-                            else -> stringResource(R.string.jobs)
-                        }
-                    )
+                title = { Text(title) },
+                navigationIcon = {
+                    if (showBack) IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                    }
                 },
-                actions = {
-                    TextButton(onClick = { selectedPage = 0 }) { Text(stringResource(R.string.jobs)) }
-                    IconButton(onClick = { selectedPage = 1 }) {
-                        Icon(Icons.Default.BookmarkBorder, contentDescription = stringResource(R.string.saved_searches_icon_description))
-                    }
-                    IconButton(onClick = { selectedPage = 2 }) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings_icon_description))
-                    }
-                }
+                actions = { actions() }
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            when (selectedPage) {
-                0 -> JobsContent(viewModel)
-                1 -> SavedSearchesContent(viewModel)
-                else -> SettingsContent(darkMode, onDarkModeChanged, onLanguageChanged)
-            }
-        }
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            content = content
+        )
     }
 }
 
