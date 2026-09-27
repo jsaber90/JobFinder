@@ -39,7 +39,6 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,7 +57,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ai.jobfinder.data.AppDatabase
 import com.ai.jobfinder.data.JobRepository
@@ -103,8 +101,6 @@ class MainActivity : ComponentActivity() {
                 )
                 JobFinderScreen(
                     viewModel = jobViewModel,
-                    initialRoute = preferences.getString("last_route", "jobs") ?: "jobs",
-                    onRouteChanged = { route -> preferences.edit().putString("last_route", route).apply() },
                     darkMode = darkMode,
                     onDarkModeChanged = {
                         darkMode = it
@@ -113,7 +109,6 @@ class MainActivity : ComponentActivity() {
                     onLanguageChanged = { language ->
                         preferences.edit()
                             .putString("language", language)
-                            .putString("last_route", "jobs")
                             .apply()
                         recreate()
                     }
@@ -147,18 +142,12 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 private fun JobFinderScreen(
     viewModel: com.ai.jobfinder.ui.JobViewModel,
-    initialRoute: String,
-    onRouteChanged: (String) -> Unit,
     darkMode: Boolean,
     onDarkModeChanged: (Boolean) -> Unit,
     onLanguageChanged: (String) -> Unit
 ) {
     val navController = rememberNavController()
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    LaunchedEffect(currentRoute) {
-        currentRoute?.let(onRouteChanged)
-    }
-    NavHost(navController = navController, startDestination = initialRoute.takeIf { it in setOf("jobs", "saved", "settings") } ?: "jobs") {
+    NavHost(navController = navController, startDestination = "jobs") {
         composable("jobs") { JobsPage(viewModel, navController) }
         composable("saved") { SavedSearchesPage(viewModel, navController) }
         composable("settings") { SettingsPage(darkMode, onDarkModeChanged, onLanguageChanged, navController) }
