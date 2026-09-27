@@ -12,8 +12,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class JobViewModel(private val repository: JobRepository) : ViewModel() {
-    private val query = MutableStateFlow("")
+class JobViewModel(
+    private val repository: JobRepository,
+    initialQuery: String = "",
+    private val onQueryChanged: (String) -> Unit = {}
+) : ViewModel() {
+    private val query = MutableStateFlow(initialQuery)
     private val allJobs = repository.observeJobs()
     val savedSearches: StateFlow<List<SavedSearchEntity>> = repository.observeSavedSearches()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -41,6 +45,7 @@ class JobViewModel(private val repository: JobRepository) : ViewModel() {
 
     fun updateQuery(value: String) {
         query.value = value
+        onQueryChanged(value)
     }
 
     fun addSavedSearch(keyword: String) {
