@@ -43,10 +43,21 @@ class JobViewModel(private val repository: JobRepository) : ViewModel() {
         query.value = value
     }
 
-    fun addSavedSearch(keyword: String, email: String) {
-        if (keyword.isBlank() || email.isBlank()) return
+    fun addSavedSearch(keyword: String) {
+        if (keyword.isBlank()) return
         viewModelScope.launch {
-            repository.saveSearch(SavedSearchEntity(keyword = keyword.trim(), email = email.trim()))
+            repository.saveSearch(SavedSearchEntity(keyword = keyword.trim()))
+        }
+    }
+
+    fun searchSavedSearch(keyword: String) {
+        query.value = keyword
+        viewModelScope.launch {
+            repository.syncFromJooble(
+                api = com.ai.jobfinder.data.JoobleClient.api,
+                apiKey = com.ai.jobfinder.BuildConfig.JOOBLE_API_KEY,
+                keyword = keyword
+            )
         }
     }
 
