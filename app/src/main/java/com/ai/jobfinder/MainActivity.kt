@@ -4,6 +4,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -63,6 +66,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         applyLanguage(preferences.getString("language", "en") ?: "en")
         super.onCreate(savedInstanceState)
+        createNotificationChannel()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
+        }
         enableEdgeToEdge()
         val database = AppDatabase.create(applicationContext)
         val repository = JobRepository(database.jobDao(), database.savedSearchDao())
@@ -90,6 +99,17 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = android.app.NotificationChannel(
+                "job_notifications",
+                getString(R.string.job_notifications),
+                android.app.NotificationManager.IMPORTANCE_DEFAULT
+            )
+            getSystemService(android.app.NotificationManager::class.java).createNotificationChannel(channel)
         }
     }
 
@@ -139,7 +159,12 @@ private fun JobsPage(viewModel: com.ai.jobfinder.ui.JobViewModel, navController:
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun SavedSearchesPage(viewModel: com.ai.jobfinder.ui.JobViewModel, navController: NavHostController) {
-    PageScaffold(stringResource(R.string.saved_searches), navController, true) { SavedSearchesContent(viewModel) }
+    PageScaffold(stringResource(R.string.saved_searches), navController, true) {
+        SavedSearchesContent(viewModel) { search ->
+            viewModel.searchSavedSearch(search.keyword)
+            navController.navigate("jobs")
+        }
+    }
 }
 
 @Composable
@@ -204,19 +229,20 @@ private fun ColumnScope.JobsContent(viewModel: com.ai.jobfinder.ui.JobViewModel)
 }
 
 @Composable
-private fun ColumnScope.SavedSearchesContent(viewModel: com.ai.jobfinder.ui.JobViewModel) {
+private fun ColumnScope.SavedSearchesContent(
+    viewModel: com.ai.jobfinder.ui.JobViewModel,
+    onSearchClick: (com.ai.jobfinder.data.SavedSearchEntity) -> Unit
+) {
     var keyword by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
     val searches by viewModel.savedSearches.collectAsState()
     OutlinedTextField(keyword, { keyword = it }, Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.job_keyword)) }, singleLine = true)
-    OutlinedTextField(email, { email = it }, Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.notification_email)) }, singleLine = true)
-    Button(onClick = { viewModel.addSavedSearch(keyword, email); keyword = "" }) { Text(stringResource(R.string.save_search)) }
+    Button(onClick = { viewModel.addSavedSearch(keyword); keyword = "" }) { Text(stringResource(R.string.save_search)) }
     LazyColumn(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(searches, key = { it.id }) { search ->
-            Card(Modifier.fillMaxWidth()) {
+            Card(Modifier.fillMaxWidth().clickable { onSearchClick(search) }) {
                 Column(Modifier.padding(16.dp)) {
                     Text(search.keyword, style = MaterialTheme.typography.titleMedium)
-                    Text(search.email)
+                    Text(stringResource(R.string.tap_to_search_again), style = MaterialTheme.typography.bodySmall)
                     Button(onClick = { viewModel.removeSavedSearch(search) }) { Text(stringResource(R.string.remove)) }
                 }
             }
