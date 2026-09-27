@@ -45,7 +45,13 @@ The planned job source is the Jooble Egypt REST API:
 https://eg.jooble.org/api/YOUR_API_KEY
 ```
 
-Keep the Jooble API key on a protected backend. Do not commit it to the Android project or place it directly in the APK.
+For local development, keep the key in the ignored `local.properties` file:
+
+```properties
+jooble.api.key=YOUR_API_KEY
+```
+
+The current Android prototype reads this local value to test Jooble integration. Do not commit `local.properties`, `.env`, or any API key. For production, keep the Jooble key on a protected backend because keys embedded in APKs can be extracted.
 
 ## Roadmap
 
@@ -54,3 +60,4 @@ Keep the Jooble API key on a protected backend. Do not commit it to the Android 
 - Add push and email notifications for new jobs
 - Add saved searches and job details
 - Add direct application links
+
