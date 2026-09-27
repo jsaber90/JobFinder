@@ -9,10 +9,23 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class JobViewModel(repository: JobRepository) : ViewModel() {
     private val query = MutableStateFlow("")
     private val allJobs = repository.observeJobs()
+
+    init {
+        viewModelScope.launch {
+            runCatching {
+                repository.syncFromJooble(
+                    api = com.ai.jobfinder.data.JoobleClient.api,
+                    apiKey = com.ai.jobfinder.BuildConfig.JOOBLE_API_KEY,
+                    keyword = "Android Kotlin Developer"
+                )
+            }
+        }
+    }
 
     val searchQuery: StateFlow<String> = query
     val jobs: StateFlow<List<JobEntity>> = combine(allJobs, query) { jobs, text ->
