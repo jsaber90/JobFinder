@@ -21,6 +21,6 @@
     <string name="language">اللغة</string>
     <string name="english">الإنجليزية</string>
     <string name="arabic">العربية</string>
-    <string name="email_delivery_note">إرسال البريد الإلكتروني يحتاج إلى إعداد مزود خلفي.</string>
+    <string name="email_delivery_note">ستتلقى إشعارات داخل التطبيق عند العثور على وظائف جديدة مطابقة.</string>
 </resources>
 
