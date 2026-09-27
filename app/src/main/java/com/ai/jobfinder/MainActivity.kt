@@ -20,12 +20,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -93,24 +93,39 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun JobFinderScreen(
     viewModel: com.ai.jobfinder.ui.JobViewModel,
     darkMode: Boolean,
     onDarkModeChanged: (Boolean) -> Unit,
     onLanguageChanged: (String) -> Unit
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf(0) }
-    Scaffold { padding ->
+    var selectedPage by rememberSaveable { mutableStateOf(0) }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        when (selectedPage) {
+                            1 -> stringResource(R.string.saved_searches)
+                            2 -> stringResource(R.string.settings)
+                            else -> stringResource(R.string.jobs)
+                        }
+                    )
+                },
+                actions = {
+                    TextButton(onClick = { selectedPage = 0 }) { Text(stringResource(R.string.jobs)) }
+                    TextButton(onClick = { selectedPage = 1 }) { Text(stringResource(R.string.saved_searches)) }
+                    TextButton(onClick = { selectedPage = 2 }) { Text(stringResource(R.string.settings)) }
+                }
+            )
+        }
+    ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            TabRow(selectedTabIndex = selectedTab) {
-                Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text(stringResource(R.string.jobs)) })
-                Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text(stringResource(R.string.saved_searches)) })
-                Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text(stringResource(R.string.settings)) })
-            }
-            when (selectedTab) {
+            when (selectedPage) {
                 0 -> JobsContent(viewModel)
                 1 -> SavedSearchesContent(viewModel)
                 else -> SettingsContent(darkMode, onDarkModeChanged, onLanguageChanged)
