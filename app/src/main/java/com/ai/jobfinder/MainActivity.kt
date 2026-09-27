@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -28,6 +30,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -115,8 +120,12 @@ private fun JobFinderScreen(
                 },
                 actions = {
                     TextButton(onClick = { selectedPage = 0 }) { Text(stringResource(R.string.jobs)) }
-                    TextButton(onClick = { selectedPage = 1 }) { Text(stringResource(R.string.saved_searches)) }
-                    TextButton(onClick = { selectedPage = 2 }) { Text(stringResource(R.string.settings)) }
+                    IconButton(onClick = { selectedPage = 1 }) {
+                        Icon(Icons.Default.BookmarkBorder, contentDescription = stringResource(R.string.saved_searches_icon_description))
+                    }
+                    IconButton(onClick = { selectedPage = 2 }) {
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings_icon_description))
+                    }
                 }
             )
         }
