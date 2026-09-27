@@ -62,7 +62,7 @@ private fun JobFinderScreen(viewModel: com.ai.jobfinder.ui.JobViewModel) {
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("J Finder", style = MaterialTheme.typography.headlineMedium)
+            Text("Jobs", style = MaterialTheme.typography.headlineMedium)
             OutlinedTextField(
                 value = query,
                 onValueChange = viewModel::updateQuery,
