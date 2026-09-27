@@ -2,8 +2,15 @@ package com.ai.jobfinder.data
 
 import kotlinx.coroutines.flow.Flow
 
-class JobRepository(private val dao: JobDao) {
+class JobRepository(
+    private val dao: JobDao,
+    private val savedSearchDao: SavedSearchDao
+) {
     fun observeJobs(): Flow<List<JobEntity>> = dao.observeJobs()
+    fun observeSavedSearches(): Flow<List<SavedSearchEntity>> = savedSearchDao.observeAll()
+
+    suspend fun saveSearch(search: SavedSearchEntity) = savedSearchDao.insert(search)
+    suspend fun deleteSearch(search: SavedSearchEntity) = savedSearchDao.delete(search)
 
     suspend fun saveJobs(jobs: List<JobEntity>) {
         dao.insertAll(jobs)
