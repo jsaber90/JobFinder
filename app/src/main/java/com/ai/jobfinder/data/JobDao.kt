@@ -12,7 +12,7 @@ interface JobDao {
     fun observeJobs(): Flow<List<JobEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(jobs: List<JobEntity>)
+    suspend fun insertAll(jobs: List<JobEntity>): List<Long>
 
     @Query("UPDATE jobs SET notified = 1 WHERE id IN (:ids)")
     suspend fun markNotified(ids: List<String>)
