@@ -5,6 +5,7 @@
     <string name="settings">الإعدادات</string>
     <string name="saved_searches_icon_description">عمليات البحث المحفوظة</string>
     <string name="settings_icon_description">الإعدادات</string>
+    <string name="back">رجوع</string>
     <string name="search_jobs_hint">ابحث عن وظائف أو مهارات أو شركات</string>
     <string name="no_matching_jobs">لا توجد وظائف مطابقة حتى الآن.</string>
     <string name="tap_to_apply">اضغط للتقديم</string>
