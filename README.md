@@ -9,6 +9,7 @@ JobFinder is an Android app for finding relevant job opportunities by keyword, w
 - Kotlin coroutines and `Flow`
 - Room database for saved jobs
 - Keyword filtering by title, company, location, and description
+- In-app notifications for new jobs that open the job link when tapped
 - JobFinder launcher icon
 - Android project configured for Gradle, Retrofit, Room, and WorkManager
 
@@ -42,7 +43,6 @@ The current Android prototype reads this local value to test Jooble integration.
 
 - Add Jooble API synchronization
 - Add WorkManager periodic background sync
-- Show in-app notifications when the background sync finds new matching jobs
+- Improve in-app notifications and background sync controls
 - Add saved searches and job details
-- Add direct application links
-
+- Add richer job details and application tracking
