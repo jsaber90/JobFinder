@@ -1,6 +1,9 @@
 package com.ai.jobfinder.data
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -42,11 +45,21 @@ class JobSyncWorker(
                 )
             )
         }
+        val openJobIntent = Intent(Intent.ACTION_VIEW, Uri.parse(job.url)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val openJobPendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            job.id.hashCode(),
+            openJobIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(applicationContext.getString(R.string.new_job_found))
             .setContentText("$keyword: ${job.title}")
             .setStyle(NotificationCompat.BigTextStyle().bigText("${job.title} · ${job.company}\n${job.location}"))
+            .setContentIntent(openJobPendingIntent)
             .setAutoCancel(true)
             .build()
         NotificationManagerCompat.from(applicationContext).notify(job.id.hashCode(), notification)
